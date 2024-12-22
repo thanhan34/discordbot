@@ -1,4 +1,4 @@
-discord.py
-python-dotenv
-apscheduler
-aiohttp>=3.7.4
+discord.py==2.4.0
+python-dotenv==1.0.1
+APScheduler==3.11.0
+aiohttp==3.11.11

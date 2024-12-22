@@ -1,0 +1,22 @@
+{
+  "name": "discord-pte-bot",
+  "version": "1.0.0",
+  "description": "Discord bot for PTE study reminders",
+  "main": "bot.py",
+  "scripts": {
+    "start": "python3 bot.py"
+  },
+  "engines": {
+    "node": "14.x"
+  },
+  "repository": {
+    "url": "https://glitch.com/edit/#!/balanced-adaptable-skiff"
+  },
+  "license": "MIT",
+  "keywords": [
+    "node",
+    "glitch",
+    "python",
+    "discord"
+  ]
+}
