@@ -1,12 +1,20 @@
 import os
 import discord
 import datetime
+import asyncio
+import logging
+from aiohttp import web
 from discord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
+
+# Enable logging
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # Bot setup
 intents = discord.Intents.default()
@@ -340,7 +348,15 @@ async def send_daily_message():
 
 @bot.event
 async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
+    logging.info(f'{bot.user} has connected to Discord!')
+    
+    # Send test message
+    channel = bot.get_channel(CHANNEL_ID)
+    if channel:
+        await channel.send("Bot is now running on Glitch! 🚀")
+        logging.info(f"Test message sent to channel {CHANNEL_ID}")
+    else:
+        logging.error(f"Could not find channel with ID: {CHANNEL_ID}")
     
     # Set up scheduler
     scheduler = AsyncIOScheduler()
@@ -351,9 +367,30 @@ async def on_ready():
     )
     scheduler.start()
 
+# Set up web server for UptimeRobot pings
+async def setup_webserver():
+    app = web.Application()
+    app.router.add_get("/", lambda request: web.Response(text="Bot is alive!"))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", 3000)
+    await site.start()
+    logging.info("Web server started on port 3000")
+
 # Run the bot
-def run():
-    bot.run(os.getenv('DISCORD_TOKEN'))
+async def run_bot():
+    token = os.getenv('DISCORD_TOKEN')
+    if not token:
+        logging.error("No Discord token found in environment variables!")
+        return
+    try:
+        # Start web server for UptimeRobot
+        await setup_webserver()
+        # Start the bot
+        await bot.start(token)
+    except Exception as e:
+        logging.error(f"Error running bot: {e}")
 
 if __name__ == "__main__":
-    run()
+    # Run both the web server and bot
+    asyncio.run(run_bot())
